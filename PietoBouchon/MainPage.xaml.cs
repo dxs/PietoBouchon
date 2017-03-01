@@ -28,16 +28,18 @@ namespace PietoBouchon
     public sealed partial class MainPage : Page
     {
 		List<Pieton> pietons;
+		List<Projector> projectors;
 		Environ _Environnement;
 		DispatcherTimer time;
 
 		public MainPage()
         {
 			time = new DispatcherTimer();
-			time.Interval = new TimeSpan(0, 0, 0, 0, 50);
+			time.Interval = new TimeSpan(0, 0, 0, 0, 5);
 			time.Tick += Time_Tick;
 			pietons = new List<Pieton>();
-			pietons.Add(new Pieton() { Id = 1, Direction = Math.PI/4, Position = new Coordinate() { X = 0, Y = 0 }, Velocity = 10 });
+			projectors = new List<Projector>();
+			projectors.Add(new Projector(10, 50){ Position = new Coordinate() { X = 0, Y = 0 } });
 			this.InitializeComponent();
         }
 
@@ -51,6 +53,15 @@ namespace PietoBouchon
 				Canvas.SetLeft(ellipse, newCoord.X);
 				Canvas.SetTop(ellipse, newCoord.Y);
 				SimulationCanvas.Children.Add(ellipse);
+			}
+
+			foreach(Projector p in projectors)
+			{
+				Coordinate newCoord = _Environnement.PositionCorrection(p.Position);
+				Rectangle rect = p.Draw;
+				Canvas.SetLeft(rect, newCoord.X);
+				Canvas.SetTop(rect, newCoord.Y);
+				SimulationCanvas.Children.Add(rect);
 			}
 		}
 
@@ -72,10 +83,7 @@ namespace PietoBouchon
 		private void Time_Tick(object sender, object e)
 		{
 			Coordinate old = new Coordinate() { X = 0, Y = 0 };
-
-
-			
-
+			NbPeopleInSimulation.Text = pietons.Count.ToString();
 			foreach (Pieton p in pietons)
 			{
 				old.X = p.Position.X;
@@ -91,6 +99,25 @@ namespace PietoBouchon
 					Debug.WriteLine(ex.Message);
 				}
 			}
+
+			foreach(Projector p in projectors)
+			{
+				List<Pieton> list = p.CreatePieton();
+				foreach(Pieton pi in list)
+				{
+					LoadPieton(pi);
+					pietons.Add(pi);
+				}
+			}
+		}
+
+		private void LoadPieton(Pieton p)
+		{
+			Coordinate newCoord = _Environnement.PositionCorrection(p.Position);
+			Ellipse ellipse = p.Draw;
+			Canvas.SetLeft(ellipse, newCoord.X);
+			Canvas.SetTop(ellipse, newCoord.Y);
+			SimulationCanvas.Children.Add(ellipse);
 		}
 
 		private void SimulationCanvas_Loaded(object sender, RoutedEventArgs e)
