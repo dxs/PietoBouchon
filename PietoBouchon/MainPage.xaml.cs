@@ -39,7 +39,7 @@ namespace PietoBouchon
 			time.Tick += Time_Tick;
 			pietons = new List<Pieton>();
 			People = new List<Ellipse>();
-			pietons.Add(new Pieton() { Id = 1, Direction = 0, Position = new Coordinate() { X = 0, Y = 0 }, Velocity = 0.1 });
+			pietons.Add(new Pieton() { Id = 1, Direction = Math.PI/4, Position = new Coordinate() { X = 0, Y = 0 }, Velocity = 10 });
 			this.InitializeComponent();
         }
 
@@ -85,11 +85,10 @@ namespace PietoBouchon
 			{
 				old = p.Position;	
 				p.ComputeNewPosition();
-				TranslateTransform move = (People[i].RenderTransform as TranslateTransform);
 				try
 				{
-					move.X = old.X - p.Position.X;
-					move.Y = old.Y - p.Position.Y;
+					(People[i].RenderTransform as TranslateTransform).X += p.Position.X - old.X;
+					(People[i].RenderTransform as TranslateTransform).Y += p.Position.Y - old.Y;
 				}
 				catch(Exception ex)
 				{

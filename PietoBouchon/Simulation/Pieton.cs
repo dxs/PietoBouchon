@@ -41,8 +41,8 @@ namespace PietoBouchon.Simulation
 
 		public void ComputeNewPosition()
 		{
-			Position.X = Velocity * Math.Cos(Direction);
-			Position.Y = Velocity * Math.Sin(Direction);
+			Position.X += Velocity * Math.Cos(Direction);
+			Position.Y += Velocity * Math.Sin(Direction);
 		}
 
 		internal Ellipse GetEllipse()
