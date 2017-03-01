@@ -33,16 +33,37 @@ namespace PietoBouchon.Simulation
 		/// </summary>
 		public double Velocity { get; set; }
 
+		/// <summary>
+		/// The point representing the pieton
+		/// </summary>
+		public Ellipse Draw { get; set; }
+
+		public TranslateTransform Trans { get; set; }
 
 		public Pieton()
 		{
-
+			Draw = new Ellipse();
+			Draw.Width = CNST.Radius;
+			Draw.Height = CNST.Radius;
+			Draw.Fill = new SolidColorBrush(Colors.BlueViolet);
+			Draw.ManipulationMode = Windows.UI.Xaml.Input.ManipulationModes.All;
+			Trans = new TranslateTransform();
+			Draw.RenderTransform = Trans;
 		}
 
-		public void ComputeNewPosition()
+		public Coordinate GetSpeed()
 		{
-			Position.X += Velocity * Math.Cos(Direction);
-			Position.Y += Velocity * Math.Sin(Direction);
+			Coordinate c = new Coordinate();
+			c.X = Velocity * Math.Cos(Direction);
+			c.Y = Velocity * Math.Sin(Direction);
+			return c;
+		}
+
+		public Coordinate ComputeNewPosition(Coordinate c)
+		{
+			c.X += Velocity * Math.Cos(Direction);
+			c.Y += Velocity * Math.Sin(Direction);
+			return c;
 		}
 
 		internal Ellipse GetEllipse()
