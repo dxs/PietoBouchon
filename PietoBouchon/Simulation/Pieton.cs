@@ -1,6 +1,7 @@
 ﻿using PietoBouchon.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -61,8 +62,10 @@ namespace PietoBouchon.Simulation
 
 		public Coordinate ComputeNewPosition(Coordinate c)
 		{
-			c.X += Velocity * Math.Cos(Direction);
-			c.Y += Velocity * Math.Sin(Direction);
+			//Debug.WriteLine("Input : X = " + c.X + " Y = " + c.Y);
+			c.X = c.X + Velocity * Math.Cos(Direction);
+			c.Y = c.Y +Velocity * Math.Sin(Direction);
+			//Debug.WriteLine("Output : X = " + c.X + " Y = " + c.Y);
 			return c;
 		}
 

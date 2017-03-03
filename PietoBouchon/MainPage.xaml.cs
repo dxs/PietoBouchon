@@ -31,15 +31,29 @@ namespace PietoBouchon
 		List<Projector> projectors;
 		Environ _Environnement;
 		DispatcherTimer time;
+		DispatcherTimer timeProjectors;
 
 		public MainPage()
         {
 			time = new DispatcherTimer();
 			time.Interval = new TimeSpan(0, 0, 0, 0, 5);
 			time.Tick += Time_Tick;
+			timeProjectors = new DispatcherTimer();
+			timeProjectors.Interval = new TimeSpan(0, 0, 1);
+			timeProjectors.Tick += Projectors_Tick;
 			pietons = new List<Pieton>();
 			projectors = new List<Projector>();
-			projectors.Add(new Projector(10, 50){ Position = new Coordinate() { X = 0, Y = 0 } });
+			projectors.Add(new Projector(10, 50)
+			{
+				Position = new Coordinate() { X = 0, Y = 0 },
+				PietonToCreate = 100,
+			});
+			pietons.Add(new Pieton()
+			{
+				Position = new Coordinate() { X = 100, Y = -100 },
+				Direction = 0.4,
+				Velocity = CNST.Velocity
+			});
 			this.InitializeComponent();
         }
 
@@ -70,14 +84,29 @@ namespace PietoBouchon
 			if ((sender as Button).Content.ToString() == "Start")
 			{
 				time.Start();
+				timeProjectors.Start();
 				(sender as Button).Content = "Stop";
 			}
 			else
 			{
 				time.Stop();
+				timeProjectors.Stop();
 				(sender as Button).Content = "Start";
 			}
 			
+		}
+
+		private void Projectors_Tick(object sender, object e)
+		{
+			foreach (Projector p in projectors)
+			{
+				List<Pieton> list = p.CreatePieton();
+				foreach (Pieton pi in list)
+				{
+					LoadPieton(pi);
+					pietons.Add(pi);
+				}
+			}
 		}
 
 		private void Time_Tick(object sender, object e)
@@ -97,16 +126,6 @@ namespace PietoBouchon
 				catch(Exception ex)
 				{
 					Debug.WriteLine(ex.Message);
-				}
-			}
-
-			foreach(Projector p in projectors)
-			{
-				List<Pieton> list = p.CreatePieton();
-				foreach(Pieton pi in list)
-				{
-					LoadPieton(pi);
-					pietons.Add(pi);
 				}
 			}
 		}
