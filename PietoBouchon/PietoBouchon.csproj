@@ -104,6 +104,7 @@
     <Compile Include="Simulation\Modele.cs" />
     <Compile Include="Simulation\Pieton.cs" />
     <Compile Include="Simulation\Projector.cs" />
+    <Compile Include="Simulation\Wall.cs" />
     <Compile Include="Utilities\CNST.cs" />
     <Compile Include="Utilities\Coordinate.cs" />
   </ItemGroup>

@@ -27,6 +27,9 @@ namespace PietoBouchon.Simulation
 		/// </summary>
 		public double DeliveryTime { get; set; }
 
+		/// <summary>
+		/// Position of the Projector
+		/// </summary>
 		public Coordinate Position { get; set; }
 
 		/// <summary>
@@ -49,14 +52,14 @@ namespace PietoBouchon.Simulation
 		public List<Pieton> CreatePieton()
 		{
 			List<Pieton> list = new List<Pieton>();
-			for(int i = 0; i < 1; i++)
+			for(int i = 0; i < 5; i++)
 			{
 				Pieton p = new Pieton();
 				p.Direction = 0;
 				p.Velocity = 2;
 				p.Position = new Coordinate();
 				p.Position.Y = i * (Draw.Height / 5);
-				p.Position.X = this.Position.X + Draw.Width;
+				p.Position.X = Draw.Width;
 				list.Add(p);
 			}
 			return list;
