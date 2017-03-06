@@ -21,7 +21,7 @@
 		<Grid Grid.Row="1">
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
 				<Button Content="Load" Margin="10" Click="Load_Click"/>
-				<Button Content="Start" Margin="10" Click="Start_Click"/>
+				<Button Content="Start" Margin="10" Click="Start_Click" x:Name="StartButton"/>
 			</StackPanel>
 		</Grid>
 		

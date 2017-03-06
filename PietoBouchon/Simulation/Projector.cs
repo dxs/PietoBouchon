@@ -42,8 +42,14 @@ namespace PietoBouchon.Simulation
 		/// </summary>
 		public Rectangle Draw { get; set; }
 
-		public Projector(double width, double height)
+		/// <summary>
+		/// normal's angle (from horizontal)
+		/// </summary>
+		public double Angle { get; set; }
+
+		public Projector(double width, double height, double _angle = 0)
 		{
+			Angle = _angle;
 			Draw = new Rectangle();
 			Draw.Width = width; Draw.Height = height;
 			Draw.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
@@ -52,14 +58,14 @@ namespace PietoBouchon.Simulation
 		public List<Pieton> CreatePieton()
 		{
 			List<Pieton> list = new List<Pieton>();
-			for(int i = 0; i < 5; i++)
+			for(int i = 0; i < CNST.NBCreate; i++)
 			{
-				Pieton p = new Pieton();
-				p.Direction = 0;
-				p.Velocity = 2;
-				p.Position = new Coordinate();
-				p.Position.Y = i * (Draw.Height / 5);
-				p.Position.X = Draw.Width;
+				Pieton p = new Pieton()
+				{
+					Direction = this.Angle,
+					Velocity = CNST.Velocity,
+					Position = new Coordinate() { X = Draw.Width - this.Position.X, Y = i * Draw.Height / CNST.NBCreate / 2}
+				};
 				list.Add(p);
 			}
 			return list;

@@ -29,6 +29,7 @@ namespace PietoBouchon
     {
 		List<Pieton> pietons;
 		List<Projector> projectors;
+		List<Absorbeur> absorbeurs;
 		Environ _Environnement;
 		DispatcherTimer time;
 		DispatcherTimer timeProjectors;
@@ -43,22 +44,35 @@ namespace PietoBouchon
 			timeProjectors.Tick += Projectors_Tick;
 			pietons = new List<Pieton>();
 			projectors = new List<Projector>();
-			projectors.Add(new Projector(10, 50)
-			{
-				Position = new Coordinate() { X = 0, Y = 0 },
-				PietonToCreate = 100,
-			});
-			pietons.Add(new Pieton()
-			{
-				Position = new Coordinate() { X = 100, Y = -100 },
-				Direction = 0.4,
-				Velocity = CNST.Velocity
-			});
+			absorbeurs = new List<Absorbeur>();
+			Setup();
 			this.InitializeComponent();
         }
 
+		private void Setup()
+		{
+			projectors.Add(new Projector(10, 50)
+			{
+				Position = new Coordinate() { X = -250, Y = 0 },
+				PietonToCreate = 100,
+			});
+			absorbeurs.Add(new Absorbeur(10, 50)
+			{
+				Position = new Coordinate() { X = +250, Y = 0}
+			});
+			//pietons.Add(new Pieton()
+			//{
+			//	Position = new Coordinate() { X = 100, Y = -100 },
+			//	Direction = 0.4,
+			//	Velocity = CNST.Velocity
+			//});
+		}
+
 		private void Load_Click(object sender, RoutedEventArgs e)
 		{
+			timeProjectors.Stop();
+			time.Stop();
+			StartButton.Content = "Start";
 			SimulationCanvas.Children.Clear();
 			foreach (Pieton p in pietons)
 			{
@@ -73,6 +87,15 @@ namespace PietoBouchon
 			{
 				Coordinate newCoord = _Environnement.PositionCorrection(p.Position);
 				Rectangle rect = p.Draw;
+				Canvas.SetLeft(rect, newCoord.X);
+				Canvas.SetTop(rect, newCoord.Y);
+				SimulationCanvas.Children.Add(rect);
+			}
+
+			foreach (Absorbeur a in absorbeurs)
+			{
+				Coordinate newCoord = _Environnement.PositionCorrection(a.Position);
+				Rectangle rect = a.Draw;
 				Canvas.SetLeft(rect, newCoord.X);
 				Canvas.SetTop(rect, newCoord.Y);
 				SimulationCanvas.Children.Add(rect);
@@ -115,6 +138,7 @@ namespace PietoBouchon
 			NbPeopleInSimulation.Text = pietons.Count.ToString();
 			foreach (Pieton p in pietons)
 			{
+				p.MoveRandomly();
 				old.X = p.Position.X;
 				old.Y = p.Position.Y;
 				p.Position = p.ComputeNewPosition(p.Position);
@@ -127,7 +151,22 @@ namespace PietoBouchon
 				{
 					Debug.WriteLine(ex.Message);
 				}
+				CheckPieton(p);
 			}
+		}
+
+		private void CheckPieton(Pieton p)
+		{
+			foreach (Absorbeur a in absorbeurs)
+				if (a.TouchPieton(p.Position))
+				{
+					foreach (var child in SimulationCanvas.Children)
+						if (child == p.Draw)
+						{
+							absorbeurs.Remove(a);
+							break;
+						}
+				}
 		}
 
 		private void LoadPieton(Pieton p)
