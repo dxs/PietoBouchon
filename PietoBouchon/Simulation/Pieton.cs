@@ -60,6 +60,11 @@ namespace PietoBouchon.Simulation
 			this.Direction += (Rand.NextDouble() - 0.5)/3;
 		}
 
+		internal void MoveGradient(Gradient gradient)
+		{
+			this.Direction += Direction - gradient.Direction;
+		}
+
 		public Coordinate GetSpeed()
 		{
 			Coordinate c = new Coordinate();
@@ -88,5 +93,7 @@ namespace PietoBouchon.Simulation
 			e.ManipulationMode = Windows.UI.Xaml.Input.ManipulationModes.All;
 			return e;
 		}
+
+		
 	}
 }

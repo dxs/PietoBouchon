@@ -47,6 +47,7 @@ namespace PietoBouchon.Simulation
 		/// </summary>
 		public double Angle { get; set; }
 
+
 		public Projector(double width, double height, double _angle = 0)
 		{
 			Angle = _angle;
@@ -64,7 +65,7 @@ namespace PietoBouchon.Simulation
 				{
 					Direction = this.Angle,
 					Velocity = CNST.Velocity,
-					Position = new Coordinate() { X = Draw.Width - this.Position.X, Y = i * Draw.Height / CNST.NBCreate / 2}
+					Position = new Coordinate() { X = Draw.Width - this.Position.X, Y = (i * Draw.Height / CNST.NBCreate / 2) + this.Position.Y}
 				};
 				list.Add(p);
 			}

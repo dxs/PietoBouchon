@@ -33,6 +33,7 @@ namespace PietoBouchon
 		Environ _Environnement;
 		DispatcherTimer time;
 		DispatcherTimer timeProjectors;
+		List<Gradient> Parcours;
 
 		public MainPage()
         {
@@ -53,19 +54,13 @@ namespace PietoBouchon
 		{
 			projectors.Add(new Projector(10, 50)
 			{
-				Position = new Coordinate() { X = -250, Y = 0 },
+				Position = new Coordinate() { X = -250, Y = 100 },
 				PietonToCreate = 100,
 			});
 			absorbeurs.Add(new Absorbeur(10, 50)
 			{
 				Position = new Coordinate() { X = +250, Y = 0}
 			});
-			//pietons.Add(new Pieton()
-			//{
-			//	Position = new Coordinate() { X = 100, Y = -100 },
-			//	Direction = 0.4,
-			//	Velocity = CNST.Velocity
-			//});
 		}
 
 		private void Load_Click(object sender, RoutedEventArgs e)
@@ -100,6 +95,14 @@ namespace PietoBouchon
 				Canvas.SetTop(rect, newCoord.Y);
 				SimulationCanvas.Children.Add(rect);
 			}
+			GenerateGradient();
+		}
+
+		private void GenerateGradient()
+		{
+			if (Parcours == null)
+				Parcours = new List<Gradient>();
+			Parcours.Add(new Gradient(projectors[0].Position, absorbeurs[0].Position));
 		}
 
 		private void Start_Click(object sender, RoutedEventArgs e)
@@ -138,7 +141,7 @@ namespace PietoBouchon
 			NbPeopleInSimulation.Text = pietons.Count.ToString();
 			foreach (Pieton p in pietons)
 			{
-				p.MoveRandomly();
+				p.MoveGradient(Parcours[0]);
 				old.X = p.Position.X;
 				old.Y = p.Position.Y;
 				p.Position = p.ComputeNewPosition(p.Position);
