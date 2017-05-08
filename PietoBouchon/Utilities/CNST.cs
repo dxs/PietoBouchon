@@ -12,5 +12,8 @@ namespace PietoBouchon.Utilities
 		public static double CONTACT = 1e-16;
 		public static double Velocity = 1;
 		public static int NBCreate = 5;
+
+		public static Random Random = new Random();
+		public static double PietonId = 0;
 	}
 }

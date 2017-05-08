@@ -1,9 +1,5 @@
 ﻿using PietoBouchon.Utilities;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.UI;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Shapes;
@@ -46,11 +42,10 @@ namespace PietoBouchon.Simulation
 			List<Pieton> list = new List<Pieton>();
 			for(int i = 0; i < CNST.NBCreate; i++)
 			{
-				Pieton p = new Pieton()
+				Pieton p = new Pieton(CNST.PietonId++)
 				{
 					Direction = this.Angle,
-					Velocity = CNST.Velocity,
-					Position = new Coordinate { X = Draw.Width - this.Position.X, Y = (i * Draw.Height / CNST.NBCreate) + this.Position.Y}
+					Position = new Coordinate { X = Draw.Width + this.Position.X, Y = (i * Draw.Height / CNST.NBCreate) + this.Position.Y}
 				};
 				list.Add(p);
 			}

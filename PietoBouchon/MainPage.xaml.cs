@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Xml.Linq;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI;
@@ -49,7 +50,11 @@ namespace PietoBouchon
 		{
 			projectors.Add(new Projector(10, 50)
 			{
-				Position = new Coordinate() { X = 10, Y = 100 },
+				Position = new Coordinate() { X = -50, Y = 0 },
+			});
+			absorbeurs.Add(new Absorbeur(10, 50)
+			{
+				Position = new Coordinate() { X = 200, Y = 0 },
 			});
 		}
 
@@ -76,12 +81,19 @@ namespace PietoBouchon
 				Canvas.SetTop(rect, newCoord.Y);
 				SimulationCanvas.Children.Add(rect);
 			}
+			foreach(Absorbeur a in absorbeurs)
+			{
+				Coordinate newCoord = _Environnement.ConvertSimToReal(a.Position);
+				Rectangle rect = a.Draw;
+				Canvas.SetLeft(rect, newCoord.X);
+				Canvas.SetTop(rect, newCoord.Y);
+				SimulationCanvas.Children.Add(rect);
+			}
 			GenerateGradient();
 		}
 
 		private void GenerateGradient()
 		{
-			return;
 			if (Parcours == null)
 				Parcours = new List<Gradient>();
 			Parcours.Add(new Gradient(projectors[0].Position, absorbeurs[0].Position));
@@ -121,9 +133,11 @@ namespace PietoBouchon
 		{
 			Coordinate old = new Coordinate() { X = 0, Y = 0 };
 			NbPeopleInSimulation.Text = pietons.Count.ToString();
+			List<Pieton> ToDelete = new List<Pieton>();
+
 			foreach (Pieton p in pietons)
 			{
-				p.MoveRandomly();
+				p.MoveGradient(Parcours[0]);
 				old.X = p.Position.X;
 				old.Y = p.Position.Y;
 				p.Position = p.ComputeNewPosition(p.Position);
@@ -136,22 +150,25 @@ namespace PietoBouchon
 				{
 					Debug.WriteLine(ex.Message);
 				}
-				CheckPieton(p);
+				if (!CheckPieton(p))
+					ToDelete.Add(p);
+			}
+			foreach (Pieton item in ToDelete)
+			{
+				var piet = SimulationCanvas.FindName(item.Id.ToString()) as Ellipse;
+				SimulationCanvas.Children.Remove(piet);
+				pietons.Remove(item);
 			}
 		}
 
-		private void CheckPieton(Pieton p)
+		private bool CheckPieton(Pieton p)
 		{
 			foreach (Absorbeur a in absorbeurs)
 				if (a.TouchPieton(p.Position))
-				{
 					foreach (var child in SimulationCanvas.Children)
 						if (child == p.Draw)
-						{
-							absorbeurs.Remove(a);
-							break;
-						}
-				}
+							return false;
+			return true;
 		}
 
 		private void LoadPieton(Pieton p)

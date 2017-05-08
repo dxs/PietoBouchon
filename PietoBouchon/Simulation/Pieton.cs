@@ -41,14 +41,14 @@ namespace PietoBouchon.Simulation
 
 		public TranslateTransform Trans { get; set; }
 
-		private Random Rand;
-
-		public Pieton()
+		public Pieton(double id)
 		{
-			Rand = new Random();
+			Id = id;
+			Velocity = (double)CNST.Random.Next(50, 101) / 100;
 			Draw = new Ellipse();
 			Draw.Width = CNST.Radius;
 			Draw.Height = CNST.Radius;
+			Draw.Name = Id.ToString();
 			Draw.Fill = new SolidColorBrush(Colors.BlueViolet);
 			Draw.ManipulationMode = Windows.UI.Xaml.Input.ManipulationModes.All;
 			Trans = new TranslateTransform();
@@ -57,7 +57,7 @@ namespace PietoBouchon.Simulation
 
 		public void MoveRandomly()
 		{
-			this.Direction += (Rand.NextDouble() - 0.5)/3;
+			this.Direction += (CNST.Random.NextDouble() - 0.5)/3;
 		}
 
 		internal void MoveGradient(Gradient gradient)
