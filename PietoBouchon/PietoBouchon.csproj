@@ -101,7 +101,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Simulation\Absorbeur.cs" />
-    <Compile Include="Simulation\Environ.cs" />
+    <Compile Include="Simulation\Environnement.cs" />
     <Compile Include="Simulation\Gradient.cs" />
     <Compile Include="Simulation\Modele.cs" />
     <Compile Include="Simulation\Pieton.cs" />

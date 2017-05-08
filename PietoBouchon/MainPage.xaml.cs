@@ -27,39 +27,29 @@ namespace PietoBouchon
     /// </summary>
     public sealed partial class MainPage : Page
     {
-		List<Pieton> pietons;
-		List<Projector> projectors;
-		List<Absorbeur> absorbeurs;
-		Environ _Environnement;
-		DispatcherTimer time;
-		DispatcherTimer timeProjectors;
+		List<Pieton> pietons = new List<Pieton>();
+		List<Projector> projectors = new List<Projector>();
+		List<Absorbeur> absorbeurs = new List<Absorbeur>();
+		Environnement _Environnement;
+		DispatcherTimer time = new DispatcherTimer();
+		DispatcherTimer timeProjectors = new DispatcherTimer();
 		List<Gradient> Parcours;
 
 		public MainPage()
         {
-			time = new DispatcherTimer();
 			time.Interval = new TimeSpan(0, 0, 0, 0, 5);
 			time.Tick += Time_Tick;
-			timeProjectors = new DispatcherTimer();
 			timeProjectors.Interval = new TimeSpan(0, 0, 1);
 			timeProjectors.Tick += Projectors_Tick;
-			pietons = new List<Pieton>();
-			projectors = new List<Projector>();
-			absorbeurs = new List<Absorbeur>();
-			Setup();
 			this.InitializeComponent();
-        }
+			Setup();
+		}
 
 		private void Setup()
 		{
 			projectors.Add(new Projector(10, 50)
 			{
-				Position = new Coordinate() { X = -250, Y = 100 },
-				PietonToCreate = 100,
-			});
-			absorbeurs.Add(new Absorbeur(10, 50)
-			{
-				Position = new Coordinate() { X = +250, Y = 0}
+				Position = new Coordinate() { X = 10, Y = 100 },
 			});
 		}
 
@@ -71,7 +61,7 @@ namespace PietoBouchon
 			SimulationCanvas.Children.Clear();
 			foreach (Pieton p in pietons)
 			{
-				Coordinate newCoord = _Environnement.PositionCorrection(p.Position);
+				Coordinate newCoord = _Environnement.ConvertSimToReal(p.Position);
 				Ellipse ellipse = p.Draw;
 				Canvas.SetLeft(ellipse, newCoord.X);
 				Canvas.SetTop(ellipse, newCoord.Y);
@@ -80,17 +70,8 @@ namespace PietoBouchon
 
 			foreach(Projector p in projectors)
 			{
-				Coordinate newCoord = _Environnement.PositionCorrection(p.Position);
+				Coordinate newCoord = _Environnement.ConvertSimToReal(p.Position);
 				Rectangle rect = p.Draw;
-				Canvas.SetLeft(rect, newCoord.X);
-				Canvas.SetTop(rect, newCoord.Y);
-				SimulationCanvas.Children.Add(rect);
-			}
-
-			foreach (Absorbeur a in absorbeurs)
-			{
-				Coordinate newCoord = _Environnement.PositionCorrection(a.Position);
-				Rectangle rect = a.Draw;
 				Canvas.SetLeft(rect, newCoord.X);
 				Canvas.SetTop(rect, newCoord.Y);
 				SimulationCanvas.Children.Add(rect);
@@ -100,6 +81,7 @@ namespace PietoBouchon
 
 		private void GenerateGradient()
 		{
+			return;
 			if (Parcours == null)
 				Parcours = new List<Gradient>();
 			Parcours.Add(new Gradient(projectors[0].Position, absorbeurs[0].Position));
@@ -141,7 +123,7 @@ namespace PietoBouchon
 			NbPeopleInSimulation.Text = pietons.Count.ToString();
 			foreach (Pieton p in pietons)
 			{
-				p.MoveGradient(Parcours[0]);
+				p.MoveRandomly();
 				old.X = p.Position.X;
 				old.Y = p.Position.Y;
 				p.Position = p.ComputeNewPosition(p.Position);
@@ -174,7 +156,7 @@ namespace PietoBouchon
 
 		private void LoadPieton(Pieton p)
 		{
-			Coordinate newCoord = _Environnement.PositionCorrection(p.Position);
+			Coordinate newCoord = _Environnement.ConvertSimToReal(p.Position);
 			Ellipse ellipse = p.Draw;
 			Canvas.SetLeft(ellipse, newCoord.X);
 			Canvas.SetTop(ellipse, newCoord.Y);
@@ -183,7 +165,7 @@ namespace PietoBouchon
 
 		private void SimulationCanvas_Loaded(object sender, RoutedEventArgs e)
 		{
-			_Environnement = new Environ((sender as Canvas).ActualWidth, (sender as Canvas).ActualHeight);
+			_Environnement = new Environnement((sender as Canvas).ActualWidth, (sender as Canvas).ActualHeight);
 		}
 	}
 }

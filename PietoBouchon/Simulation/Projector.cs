@@ -18,24 +18,9 @@ namespace PietoBouchon.Simulation
 		public double Id { get; set; }
 
 		/// <summary>
-		/// Number of pieton to create
-		/// </summary>
-		public int PietonToCreate { get; set; }
-
-		/// <summary>
-		/// Time to delivery all the pietons, in seconds
-		/// </summary>
-		public double DeliveryTime { get; set; }
-
-		/// <summary>
 		/// Position of the Projector
 		/// </summary>
 		public Coordinate Position { get; set; }
-
-		/// <summary>
-		/// Frequency of pietons creation
-		/// </summary>
-		public double Rate { get; private set; }
 
 		/// <summary>
 		/// Rectangle representing the projector
@@ -65,16 +50,11 @@ namespace PietoBouchon.Simulation
 				{
 					Direction = this.Angle,
 					Velocity = CNST.Velocity,
-					Position = new Coordinate() { X = Draw.Width - this.Position.X, Y = (i * Draw.Height / CNST.NBCreate / 2) + this.Position.Y}
+					Position = new Coordinate { X = Draw.Width - this.Position.X, Y = (i * Draw.Height / CNST.NBCreate) + this.Position.Y}
 				};
 				list.Add(p);
 			}
 			return list;
-		}
-
-		public void ComputeTimeToCreate(bool linear = true)
-		{
-			Rate = PietonToCreate - DeliveryTime;
 		}
 	}
 }
