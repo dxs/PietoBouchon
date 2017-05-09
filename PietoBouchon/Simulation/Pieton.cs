@@ -34,6 +34,8 @@ namespace PietoBouchon.Simulation
 		/// </summary>
 		public double Velocity { get; set; }
 
+		public bool IsWaiting { get; set; }
+
 		/// <summary>
 		/// The point representing the pieton
 		/// </summary>
@@ -41,14 +43,15 @@ namespace PietoBouchon.Simulation
 
 		public TranslateTransform Trans { get; set; }
 
-		private Random Rand;
-
-		public Pieton()
+		public Pieton(double id)
 		{
-			Rand = new Random();
+			Id = id;
+			IsWaiting = false;
+			Velocity = (double)CNST.Random.Next(50, 101) / 100;
 			Draw = new Ellipse();
 			Draw.Width = CNST.Radius;
 			Draw.Height = CNST.Radius;
+			Draw.Name = Id.ToString();
 			Draw.Fill = new SolidColorBrush(Colors.BlueViolet);
 			Draw.ManipulationMode = Windows.UI.Xaml.Input.ManipulationModes.All;
 			Trans = new TranslateTransform();
@@ -57,16 +60,22 @@ namespace PietoBouchon.Simulation
 
 		public void MoveRandomly()
 		{
-			this.Direction += (Rand.NextDouble() - 0.5)/3;
+			this.Direction += (CNST.Random.NextDouble() - 0.5)/3;
 		}
 
 		internal void MoveGradient(Gradient gradient)
 		{
-			this.Direction += Direction - gradient.Direction;
+			double diff = gradient.Direction - Direction;
+			if (diff > CNST.EPSILDIRECTION)
+				Direction += diff / 10;
+			else
+				Direction = gradient.Direction;
 		}
 
 		public Coordinate GetSpeed()
 		{
+			if (IsWaiting)
+				return new Coordinate() { X = 0, Y = 0 };
 			Coordinate c = new Coordinate();
 			c.X = Velocity * Math.Cos(Direction);
 			c.Y = Velocity * Math.Sin(Direction);
@@ -75,11 +84,12 @@ namespace PietoBouchon.Simulation
 
 		public Coordinate ComputeNewPosition(Coordinate c)
 		{
-			//Debug.WriteLine("Input : X = " + c.X + " Y = " + c.Y);
-			c.X = c.X + Velocity * Math.Cos(Direction);
-			c.Y = c.Y +Velocity * Math.Sin(Direction);
-			//Debug.WriteLine("Output : X = " + c.X + " Y = " + c.Y);
-			return c;
+			if (IsWaiting)
+				return c;
+			Coordinate r = new Coordinate();
+			r.X = c.X + Velocity * Math.Cos(Direction);
+			r.Y = c.Y + Velocity * Math.Sin(Direction);
+			return r;
 		}
 
 		internal Ellipse GetEllipse()

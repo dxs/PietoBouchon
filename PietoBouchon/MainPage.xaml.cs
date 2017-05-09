@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Xml.Linq;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI;
@@ -30,6 +31,7 @@ namespace PietoBouchon
 		List<Pieton> pietons = new List<Pieton>();
 		List<Projector> projectors = new List<Projector>();
 		List<Absorbeur> absorbeurs = new List<Absorbeur>();
+		List<Wall> walls = new List<Wall>();
 		Environnement _Environnement;
 		DispatcherTimer time = new DispatcherTimer();
 		DispatcherTimer timeProjectors = new DispatcherTimer();
@@ -37,7 +39,7 @@ namespace PietoBouchon
 
 		public MainPage()
         {
-			time.Interval = new TimeSpan(0, 0, 0, 0, 5);
+			time.Interval = new TimeSpan(0, 0, 0, 0, CNST.CLOCK);
 			time.Tick += Time_Tick;
 			timeProjectors.Interval = new TimeSpan(0, 0, 1);
 			timeProjectors.Tick += Projectors_Tick;
@@ -49,8 +51,13 @@ namespace PietoBouchon
 		{
 			projectors.Add(new Projector(10, 50)
 			{
-				Position = new Coordinate() { X = 10, Y = 100 },
+				Position = new Coordinate() { X = -50, Y = 100 },
 			});
+			absorbeurs.Add(new Absorbeur(10, 50)
+			{
+				Position = new Coordinate() { X = 200, Y = -50 },
+			});
+			walls.Add(new Wall(new Coordinate() { X = 0, Y = 0 }, new Coordinate() { X = 140, Y = 30 }));
 		}
 
 		private void Load_Click(object sender, RoutedEventArgs e)
@@ -76,12 +83,26 @@ namespace PietoBouchon
 				Canvas.SetTop(rect, newCoord.Y);
 				SimulationCanvas.Children.Add(rect);
 			}
+			foreach(Absorbeur a in absorbeurs)
+			{
+				Coordinate newCoord = _Environnement.ConvertSimToReal(a.Position);
+				Rectangle rect = a.Draw;
+				Canvas.SetLeft(rect, newCoord.X);
+				Canvas.SetTop(rect, newCoord.Y);
+				SimulationCanvas.Children.Add(rect);
+			}
+			foreach(Wall w in walls)
+			{
+				Coordinate tmpStart = _Environnement.ConvertSimToReal(w.StartPoint);
+				Coordinate tmpEnd = _Environnement.ConvertSimToReal(w.EndPoint);
+				w.Line.Points = new PointCollection() { new Point(tmpStart.X, tmpStart.Y), new Point(tmpEnd.X, tmpEnd.Y) };
+				SimulationCanvas.Children.Add(w.Line);
+			}
 			GenerateGradient();
 		}
 
 		private void GenerateGradient()
 		{
-			return;
 			if (Parcours == null)
 				Parcours = new List<Gradient>();
 			Parcours.Add(new Gradient(projectors[0].Position, absorbeurs[0].Position));
@@ -106,6 +127,7 @@ namespace PietoBouchon
 
 		private void Projectors_Tick(object sender, object e)
 		{
+			timeProjectors.Stop();
 			foreach (Projector p in projectors)
 			{
 				List<Pieton> list = p.CreatePieton();
@@ -120,10 +142,18 @@ namespace PietoBouchon
 		private void Time_Tick(object sender, object e)
 		{
 			Coordinate old = new Coordinate() { X = 0, Y = 0 };
-			NbPeopleInSimulation.Text = pietons.Count.ToString();
+			List<Pieton> ToDelete = new List<Pieton>();
+
 			foreach (Pieton p in pietons)
 			{
-				p.MoveRandomly();
+				double FirstDirection = p.Direction;
+				p.MoveGradient(Parcours[0]);
+
+				if (ChekcIfPietonInStep(p))
+					continue;
+				p.Direction = CheckWall(p);
+				FirstDirection = p.Direction;
+
 				old.X = p.Position.X;
 				old.Y = p.Position.Y;
 				p.Position = p.ComputeNewPosition(p.Position);
@@ -136,22 +166,54 @@ namespace PietoBouchon
 				{
 					Debug.WriteLine(ex.Message);
 				}
-				CheckPieton(p);
+				if (!CheckPieton(p))
+					ToDelete.Add(p);
+			}
+			foreach (Pieton item in ToDelete)
+			{
+				var piet = SimulationCanvas.FindName(item.Id.ToString()) as Ellipse;
+				SimulationCanvas.Children.Remove(piet);
+				pietons.Remove(item);
 			}
 		}
 
-		private void CheckPieton(Pieton p)
+		private bool ChekcIfPietonInStep(Pieton piet)
+		{
+			foreach(Pieton p in pietons)
+			{
+				if (p.IsWaiting)
+					continue;
+				if (p == piet)
+					continue;
+				Coordinate newPos = piet.ComputeNewPosition(piet.Position);
+				if (Coordinate.Distance(newPos, p.Position) > 2 * CNST.Radius)
+					continue;
+				piet.IsWaiting = true;
+				return true;//there is a pieton in step
+			}
+			piet.IsWaiting = false;
+			return false; //Clear
+		}
+
+		private double CheckWall(Pieton p)
+		{
+			foreach (Wall w in walls)
+			{
+				double di = w.WallCheck(p);
+				if (di != p.Direction)
+					return di;
+			}
+			return p.Direction;
+		}
+
+		private bool CheckPieton(Pieton p)
 		{
 			foreach (Absorbeur a in absorbeurs)
 				if (a.TouchPieton(p.Position))
-				{
 					foreach (var child in SimulationCanvas.Children)
 						if (child == p.Draw)
-						{
-							absorbeurs.Remove(a);
-							break;
-						}
-				}
+							return false;
+			return true;
 		}
 
 		private void LoadPieton(Pieton p)
