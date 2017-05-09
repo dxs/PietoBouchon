@@ -39,7 +39,7 @@ namespace PietoBouchon
 
 		public MainPage()
         {
-			time.Interval = new TimeSpan(0, 0, 0, 0, 5);
+			time.Interval = new TimeSpan(0, 0, 0, 0, CNST.CLOCK);
 			time.Tick += Time_Tick;
 			timeProjectors.Interval = new TimeSpan(0, 0, 1);
 			timeProjectors.Tick += Projectors_Tick;
@@ -146,9 +146,13 @@ namespace PietoBouchon
 
 			foreach (Pieton p in pietons)
 			{
+				double FirstDirection = p.Direction;
 				p.MoveGradient(Parcours[0]);
 
+				if (ChekcIfPietonInStep(p))
+					continue;
 				p.Direction = CheckWall(p);
+				FirstDirection = p.Direction;
 
 				old.X = p.Position.X;
 				old.Y = p.Position.Y;
@@ -171,6 +175,24 @@ namespace PietoBouchon
 				SimulationCanvas.Children.Remove(piet);
 				pietons.Remove(item);
 			}
+		}
+
+		private bool ChekcIfPietonInStep(Pieton piet)
+		{
+			foreach(Pieton p in pietons)
+			{
+				if (p.IsWaiting)
+					continue;
+				if (p == piet)
+					continue;
+				Coordinate newPos = piet.ComputeNewPosition(piet.Position);
+				if (Coordinate.Distance(newPos, p.Position) > 2 * CNST.Radius)
+					continue;
+				piet.IsWaiting = true;
+				return true;//there is a pieton in step
+			}
+			piet.IsWaiting = false;
+			return false; //Clear
 		}
 
 		private double CheckWall(Pieton p)

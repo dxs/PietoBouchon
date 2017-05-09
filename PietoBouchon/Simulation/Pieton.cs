@@ -34,6 +34,8 @@ namespace PietoBouchon.Simulation
 		/// </summary>
 		public double Velocity { get; set; }
 
+		public bool IsWaiting { get; set; }
+
 		/// <summary>
 		/// The point representing the pieton
 		/// </summary>
@@ -44,6 +46,7 @@ namespace PietoBouchon.Simulation
 		public Pieton(double id)
 		{
 			Id = id;
+			IsWaiting = false;
 			Velocity = (double)CNST.Random.Next(50, 101) / 100;
 			Draw = new Ellipse();
 			Draw.Width = CNST.Radius;
@@ -71,6 +74,8 @@ namespace PietoBouchon.Simulation
 
 		public Coordinate GetSpeed()
 		{
+			if (IsWaiting)
+				return new Coordinate() { X = 0, Y = 0 };
 			Coordinate c = new Coordinate();
 			c.X = Velocity * Math.Cos(Direction);
 			c.Y = Velocity * Math.Sin(Direction);
@@ -79,6 +84,8 @@ namespace PietoBouchon.Simulation
 
 		public Coordinate ComputeNewPosition(Coordinate c)
 		{
+			if (IsWaiting)
+				return c;
 			Coordinate r = new Coordinate();
 			r.X = c.X + Velocity * Math.Cos(Direction);
 			r.Y = c.Y + Velocity * Math.Sin(Direction);
