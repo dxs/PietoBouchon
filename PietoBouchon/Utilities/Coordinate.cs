@@ -14,5 +14,12 @@ namespace PietoBouchon.Utilities
 		{
 
 		}
+
+		public static double Distance(Coordinate A, Coordinate B)
+		{
+			double dX = Math.Abs(B.X - A.X);
+			double dY = Math.Abs(B.Y - A.Y);
+			return Math.Sqrt(Math.Pow(dX, 2) + Math.Pow(dY, 2));
+		}
 	}
 }

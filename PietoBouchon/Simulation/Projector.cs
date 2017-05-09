@@ -31,6 +31,7 @@ namespace PietoBouchon.Simulation
 
 		public Projector(double width, double height, double _angle = 0)
 		{
+			Id = CNST.ProjId++;
 			Angle = _angle;
 			Draw = new Rectangle();
 			Draw.Width = width; Draw.Height = height;

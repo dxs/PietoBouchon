@@ -36,6 +36,7 @@ namespace PietoBouchon.Simulation
 
 		public Absorbeur(double _width, double _height, double _angle = 0)
 		{
+			Id = CNST.AbsoId++;
 			Angle = _angle;
 			Draw = new Rectangle();
 			Draw.Width = _width; Draw.Height = _height;
@@ -46,9 +47,9 @@ namespace PietoBouchon.Simulation
 		{
 			bool inHeight = false;
 			bool inWidth = false;
-			if (position.X > this.Position.X && position.X < this.Position.X + this.Draw.Width)
+			if (position.X > this.Position.X - CNST.EPSIL && position.X < this.Position.X + this.Draw.Width + CNST.EPSIL)
 				inWidth = true;
-			if (position.Y > this.Position.Y && position.Y < this.Position.Y + this.Draw.Height)
+			if (position.Y > this.Position.Y - CNST.EPSIL && position.Y < this.Position.Y + this.Draw.Height + CNST.EPSIL)
 				inHeight = true;
 			if (inWidth && inHeight)
 				return true;

@@ -50,7 +50,7 @@ namespace PietoBouchon
 		{
 			projectors.Add(new Projector(10, 50)
 			{
-				Position = new Coordinate() { X = -50, Y = 0 },
+				Position = new Coordinate() { X = -50, Y = 200 },
 			});
 			absorbeurs.Add(new Absorbeur(10, 50)
 			{
@@ -118,6 +118,7 @@ namespace PietoBouchon
 
 		private void Projectors_Tick(object sender, object e)
 		{
+			timeProjectors.Stop();
 			foreach (Projector p in projectors)
 			{
 				List<Pieton> list = p.CreatePieton();
@@ -132,7 +133,6 @@ namespace PietoBouchon
 		private void Time_Tick(object sender, object e)
 		{
 			Coordinate old = new Coordinate() { X = 0, Y = 0 };
-			NbPeopleInSimulation.Text = pietons.Count.ToString();
 			List<Pieton> ToDelete = new List<Pieton>();
 
 			foreach (Pieton p in pietons)

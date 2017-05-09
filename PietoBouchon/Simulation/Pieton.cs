@@ -62,7 +62,11 @@ namespace PietoBouchon.Simulation
 
 		internal void MoveGradient(Gradient gradient)
 		{
-			this.Direction += Direction - gradient.Direction;
+			double diff = gradient.Direction - Direction;
+			if (diff > CNST.EPSILDIRECTION)
+				Direction += diff / 10;
+			else
+				Direction = gradient.Direction;
 		}
 
 		public Coordinate GetSpeed()
