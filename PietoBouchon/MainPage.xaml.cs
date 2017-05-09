@@ -31,6 +31,7 @@ namespace PietoBouchon
 		List<Pieton> pietons = new List<Pieton>();
 		List<Projector> projectors = new List<Projector>();
 		List<Absorbeur> absorbeurs = new List<Absorbeur>();
+		List<Wall> walls = new List<Wall>();
 		Environnement _Environnement;
 		DispatcherTimer time = new DispatcherTimer();
 		DispatcherTimer timeProjectors = new DispatcherTimer();
@@ -50,12 +51,13 @@ namespace PietoBouchon
 		{
 			projectors.Add(new Projector(10, 50)
 			{
-				Position = new Coordinate() { X = -50, Y = 200 },
+				Position = new Coordinate() { X = -50, Y = 100 },
 			});
 			absorbeurs.Add(new Absorbeur(10, 50)
 			{
-				Position = new Coordinate() { X = 200, Y = 0 },
+				Position = new Coordinate() { X = 200, Y = -50 },
 			});
+			walls.Add(new Wall(new Coordinate() { X = 0, Y = 0 }, new Coordinate() { X = 140, Y = 30 }));
 		}
 
 		private void Load_Click(object sender, RoutedEventArgs e)
@@ -88,6 +90,13 @@ namespace PietoBouchon
 				Canvas.SetLeft(rect, newCoord.X);
 				Canvas.SetTop(rect, newCoord.Y);
 				SimulationCanvas.Children.Add(rect);
+			}
+			foreach(Wall w in walls)
+			{
+				Coordinate tmpStart = _Environnement.ConvertSimToReal(w.StartPoint);
+				Coordinate tmpEnd = _Environnement.ConvertSimToReal(w.EndPoint);
+				w.Line.Points = new PointCollection() { new Point(tmpStart.X, tmpStart.Y), new Point(tmpEnd.X, tmpEnd.Y) };
+				SimulationCanvas.Children.Add(w.Line);
 			}
 			GenerateGradient();
 		}
@@ -138,6 +147,9 @@ namespace PietoBouchon
 			foreach (Pieton p in pietons)
 			{
 				p.MoveGradient(Parcours[0]);
+
+				p.Direction = CheckWall(p);
+
 				old.X = p.Position.X;
 				old.Y = p.Position.Y;
 				p.Position = p.ComputeNewPosition(p.Position);
@@ -159,6 +171,17 @@ namespace PietoBouchon
 				SimulationCanvas.Children.Remove(piet);
 				pietons.Remove(item);
 			}
+		}
+
+		private double CheckWall(Pieton p)
+		{
+			foreach (Wall w in walls)
+			{
+				double di = w.WallCheck(p);
+				if (di != p.Direction)
+					return di;
+			}
+			return p.Direction;
 		}
 
 		private bool CheckPieton(Pieton p)

@@ -79,11 +79,10 @@ namespace PietoBouchon.Simulation
 
 		public Coordinate ComputeNewPosition(Coordinate c)
 		{
-			//Debug.WriteLine("Input : X = " + c.X + " Y = " + c.Y);
-			c.X = c.X + Velocity * Math.Cos(Direction);
-			c.Y = c.Y +Velocity * Math.Sin(Direction);
-			//Debug.WriteLine("Output : X = " + c.X + " Y = " + c.Y);
-			return c;
+			Coordinate r = new Coordinate();
+			r.X = c.X + Velocity * Math.Cos(Direction);
+			r.Y = c.Y + Velocity * Math.Sin(Direction);
+			return r;
 		}
 
 		internal Ellipse GetEllipse()

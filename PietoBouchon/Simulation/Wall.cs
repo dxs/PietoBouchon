@@ -27,7 +27,6 @@ namespace PietoBouchon.Simulation
 			Line.Stroke = new SolidColorBrush(Windows.UI.Colors.OrangeRed);
 			Line.StrokeThickness = 1;
 			Line.Name = CNST.WallId++.ToString();
-			Line.Points = new PointCollection() { new Point(StartPoint.X, StartPoint.Y), new Point(EndPoint.X, EndPoint.Y) };
 			ComputeSlope();
 		}
 
@@ -40,24 +39,40 @@ namespace PietoBouchon.Simulation
 
 			Slope = Y / X;
 			//Compute offset
-			offset = Slope * StartPoint.X - StartPoint.Y;
+			offset = StartPoint.Y - Slope * StartPoint.X;
 		}
 
-		public void WallCheck(Pieton piet)
+		public double WallCheck(Pieton piet)
 		{
+			Coordinate Start = new Coordinate() { X = piet.Position.X, Y = piet.Position.Y };
 			Coordinate End = piet.ComputeNewPosition(piet.Position);
-			double X = End.X - piet.Position.X;
-			double Y = End.Y - piet.Position.Y;
+			double X = End.X - Start.X;
+			double Y = End.Y - Start.Y;
 			if (X == 0) X = CNST.EPSIL;
 			if (Y == 0) Y = CNST.EPSIL;
 			double PietSlope = Y / X;
-			double PietOff = PietSlope * piet.Position.X - piet.Position.Y;
+			double PietOff = Start.Y - PietSlope * Start.X;
 
 			Coordinate shock = new Coordinate();
 			/*x = (d - b) / (a - c)*/
 			shock.X = (PietOff - offset) / (Slope - PietSlope);
 			shock.Y = offset + Slope * shock.X;
-			double 
+
+			double distToWall = Coordinate.Distance(shock, Start);
+			if (distToWall > CNST.Radius * Coordinate.Distance(End, Start))
+				return piet.Direction;
+
+			if (EndPoint.X - StartPoint.X > 0)
+			{
+				if (shock.X > EndPoint.X || shock.X < StartPoint.X)
+					return piet.Direction;
+			}
+			else
+			{
+				if (shock.X < EndPoint.X || shock.X > StartPoint.X)
+					return piet.Direction;
+			}
+			return Math.Tan(Slope);
 		}
 	}
 }
