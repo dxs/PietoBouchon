@@ -11,7 +11,7 @@ namespace PietoBouchon.Utilities
 		public static double Radius = 10;
 		public static double CONTACT = 1e-16;
 		public static double Velocity = 1;
-		public static int NBCreate = 5;
+		public static int NBCreate = 4;
 		public static int CLOCK = 5;
 
 		public static double EPSIL = 1e-5;

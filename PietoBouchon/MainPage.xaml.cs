@@ -127,7 +127,7 @@ namespace PietoBouchon
 
 		private void Projectors_Tick(object sender, object e)
 		{
-			timeProjectors.Stop();
+			//timeProjectors.Stop();
 			foreach (Projector p in projectors)
 			{
 				List<Pieton> list = p.CreatePieton();
@@ -181,12 +181,10 @@ namespace PietoBouchon
 		{
 			foreach(Pieton p in pietons)
 			{
-				if (p.IsWaiting)
-					continue;
 				if (p == piet)
 					continue;
 				Coordinate newPos = piet.ComputeNewPosition(piet.Position);
-				if (Coordinate.Distance(newPos, p.Position) > 2 * CNST.Radius)
+				if (Coordinate.Distance(newPos, p.Position) >= CNST.Radius)
 					continue;
 				piet.IsWaiting = true;
 				return true;//there is a pieton in step
